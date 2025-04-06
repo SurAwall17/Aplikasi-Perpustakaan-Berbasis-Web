@@ -8,7 +8,9 @@ use App\Models\Denda;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\DendaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -20,7 +22,10 @@ class DendaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
     protected static ?string $navigationGroup = 'Denda';
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
@@ -48,12 +53,12 @@ class DendaResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('pengembalian.peminjaman.buku.judul_buku'),
-                TextColumn::make('pengembalian.peminjaman.user.name')->label('Peminjam'),
+                TextColumn::make('pengembalian.peminjaman.buku.judul_buku')->searchable(),
+                TextColumn::make('pengembalian.peminjaman.user.name')->label('Peminjam')->searchable(),
                 TextColumn::make('pengembalian.peminjaman.buku.harga_buku')->label('Harga Buku'),
-                TextColumn::make('pengembalian.kategori_denda.nama_kategori')->label('Kondisi Buku'),
-                TextColumn::make('pengembalian.denda')->label('Total Denda'),
-                TextColumn::make('status')
+                TextColumn::make('pengembalian.kategori_denda.nama_kategori')->label('Kondisi Buku')->searchable(),
+                TextColumn::make('pengembalian.denda')->label('Total Denda')->searchable(),
+                TextColumn::make('status')->searchable()
                 ->badge()
                 ->color(fn (string $state): string => match ($state) {
                     'Sudah Dibayar' => 'success',
@@ -64,6 +69,27 @@ class DendaResource extends Resource
                 //
             ])
             ->actions([
+                Action::make('konfirmasiDenda')
+                ->label('Bayar Denda')
+                ->icon('heroicon-o-credit-card')
+                ->color('success')
+                ->modalHeading('Konfirmasi Pembayaran Denda')
+                ->modalSubmitActionLabel('Konfirmasi')
+                ->form([
+                    TextInput::make('jumlah_denda')
+                        ->label('Jumlah Denda')
+                        ->required()
+                        ->disabled()
+                        ->default(fn($record) => $record->pengembalian->denda ?? 0)
+                        ->numeric(),
+                ])
+                ->action(function (array $data, $record) {
+                    // Logika ketika form disubmit
+                    $record->update([
+                        'status' => 'Sudah Dibayar',
+                        'jumlah_denda' => $data['jumlah_denda'],
+                    ]);
+                }),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

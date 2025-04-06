@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreign('id_peminjaman')->references('id')->on('peminjaman')->cascadeOnDelete();
             $table->unsignedBigInteger('id_kategori_denda');
             $table->foreign('id_kategori_denda')->references('id')->on('kategori_denda')->cascadeOnDelete();
+
+            $table->date('tgl_kembali');
             $table->string('denda');
             $table->timestamps();
         });

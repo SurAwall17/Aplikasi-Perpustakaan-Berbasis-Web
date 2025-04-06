@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\Buku;
 use App\Models\User;
@@ -14,8 +15,8 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -28,7 +29,10 @@ class PeminjamanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
     protected static ?string $navigationGroup = 'Management';
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function getNavigationLabel(): string{
         return "Peminjaman";
     }
@@ -76,10 +80,17 @@ class PeminjamanResource extends Resource
         
             DatePicker::make('tgl_peminjaman')
                 ->format('Y/m/d')
+                ->reactive()
                 ->rules([
                     "after_or_equal:1900-01-01",
                     "before_or_equal:" . date('Y/m/d')
                 ])
+                ->afterStateUpdated(
+                    function ($state, callable $set){
+                        $pengembalian = Carbon::parse($state)->addDays(10)->format('Y-m-d');
+                        $set('tgl_pengembalian', $pengembalian);
+                    }
+                )
                 ->required(),
         
             Select::make('id_buku')
@@ -119,8 +130,7 @@ class PeminjamanResource extends Resource
                 ->dehydrated(false),
         
             DatePicker::make('tgl_pengembalian')
-                ->format('Y/m/d')
-                ->rules(["after_or_equal:1900-01-01"]),
+            ->readOnly()
         
             
                 ])
@@ -134,13 +144,13 @@ class PeminjamanResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.nis')->label('Nis'),
-                TextColumn::make('user.name')->label('Nama User'),
-                TextColumn::make('user.kelas')->label('Kelas'),
-                TextColumn::make('buku.pengarang')->label('Pengarang'),
-                TextColumn::make('tgl_peminjaman'),
-                TextColumn::make('tgl_pengembalian'),
-                TextColumn::make('status')
+                TextColumn::make('user.nis')->label('Nis')->searchable(),
+                TextColumn::make('user.name')->label('Nama User')->searchable(),
+                TextColumn::make('user.kelas')->label('Kelas')->searchable(),
+                TextColumn::make('buku.pengarang')->label('Pengarang')->searchable(),
+                TextColumn::make('tgl_peminjaman')->searchable()->sortable(),
+                TextColumn::make('tgl_pengembalian')->searchable()->sortable(),
+                TextColumn::make('status')->searchable()
                 ->badge()
                 ->color(fn (string $state): string => match ($state) {
                     'dipinjam' => 'warning',

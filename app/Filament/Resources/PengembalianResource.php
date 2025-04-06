@@ -18,6 +18,7 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PengembalianResource\Pages;
@@ -29,8 +30,10 @@ class PengembalianResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
     protected static ?string $navigationGroup = 'Management';
-
-
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
     public static function getNavigationLabel(): string{
         return "Pengembalian";
     }
@@ -42,7 +45,7 @@ class PengembalianResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['peminjaman', 'kategori_denda']);
+            ->with(['peminjaman.user', 'peminjaman.buku', 'kategori_denda']);
     }
 
     public static function form(Form $form): Form
@@ -53,11 +56,9 @@ class PengembalianResource extends Resource
                     ->schema([
                         Hidden::make('id_peminjaman')
                             ->dehydrated(true),
-
-                        Hidden::make('id_kategori_denda')
-                            ->dehydrated(true),
-
+                        
                         Select::make('nis')
+                        ->formatStateUsing(fn($record) => $record?->peminjaman?->user?->id)
                         ->options(
                             User::whereIn(
                                 'id',
@@ -65,7 +66,9 @@ class PengembalianResource extends Resource
                             )
                             ->get()
                             ->pluck('nis', 'id')
-                        )
+                            )
+
+                        
 
                         ->reactive()
                         ->afterStateUpdated(function ($state, callable $set){
@@ -74,8 +77,9 @@ class PengembalianResource extends Resource
                             $set('kelas', $user?->kelas);
                             $set('judul_buku', null);
                             $set('harga_buku', null);
-                            $set('kondisi_buku', null);
+                            $set('id_kategori_denda', null);
                             $set('denda', null);
+                            $set('baco', fn($record) => $record?->peminjaman?->user?->kelas);
 
                             $peminjaman = Peminjaman::where('id_user', $state)->latest()->first();
                             $set('id_peminjaman', $peminjaman?->id);
@@ -85,30 +89,37 @@ class PengembalianResource extends Resource
                         ->dehydrated(false),
 
                         TextInput::make('name')
+                        ->formatStateUsing(fn($record) => $record?->peminjaman?->user?->name)
                         ->disabled(),
 
                         TextInput::make('kelas')
+                        ->formatStateUsing(fn($record) => $record?->peminjaman?->user?->kelas)
                         ->disabled(),
 
                         Select::make('judul_buku')
                         ->label('Judul Buku')
-                        ->options(function (callable $get) {
+                        ->formatStateUsing(fn($record) => $record?->peminjaman?->buku?->id)
+                        ->options(function (callable $get, $record = null) {
                             $userId = $get('nis');
-
+                    
+                            // Jika sedang edit, tampilkan semua buku
+                            if ($record) {
+                                return Buku::pluck('judul_buku', 'id');
+                            }
+                    
+                            // Jika create dan nis belum diisi, kembalikan array kosong
                             if (!$userId) {
                                 return [];
                             }
-
-                            // Ambil ID buku yang dipinjam oleh user
-                            $bukuIds = Peminjaman::where('id_user', $userId)
-                                ->pluck('id_buku');
-
-                            // Ambil judul buku berdasarkan id
+                    
+                            // Jika create dan nis ada, tampilkan buku yang pernah dipinjam user
+                            $bukuIds = Peminjaman::where('id_user', $userId)->pluck('id_buku');
+                    
                             return Buku::whereIn('id', $bukuIds)
                                 ->pluck('judul_buku', 'id');
                         })
                         ->afterStateUpdated(
-                            function ($state, callable $set, callable $get){
+                            function ($state, $record, callable $set, $get){
                                 $userId = $get('nis');
                                 $bukuId = $state;
 
@@ -123,28 +134,12 @@ class PengembalianResource extends Resource
                                 ->first();
 
                                 $set('tgl_pengembalian', $peminjaman?->tgl_pengembalian);
-                            }
-                        )
-                        ->searchable()
-                        ->reactive()
-                        ->dehydrated(false)
-                        ->required(),
 
-                        TextInput::make('pengarang')->disabled(),
-                        TextInput::make('tgl_pengembalian')->disabled()->reactive(),
-                        TextInput::make('harga_buku')->hidden(),
-
-                        Select::make('kondisi_buku')
-                            ->options(
-                                KategoriDenda::all()->pluck('nama_kategori', 'id')
-                            )
-                            ->reactive()
-                            ->disabled(fn (callable $get) => !$get('nis') || !$get('judul_buku'))
-                            ->afterStateUpdated(
-                                function($state, callable $set, callable $get){
-                                    $kategori = KategoriDenda::find($state);
+                                if ($record) {
+                                
+                                    $kategori = KategoriDenda::find($get('id_kategori_denda'));
+                                    
                                     $denda_kerusakan =  $kategori->jumlah_denda * $get('harga_buku');
-
                                     $tgl_pengembalian = $get('tgl_pengembalian');
                                     if($tgl_pengembalian && Carbon::parse($tgl_pengembalian)->isPast()){
                                         $set('denda', $denda_kerusakan + 20000 );
@@ -154,8 +149,43 @@ class PengembalianResource extends Resource
                                     }
                                     $set('id_kategori_denda', $kategori?->id);
                                 }
+                                
+                            }
+                        )
+                        ->searchable()
+                        ->reactive()
+                        ->dehydrated(false)
+                        ->required(),
+
+                        TextInput::make('pengarang')->disabled()->formatStateUsing(fn($record) => $record?->peminjaman?->buku?->pengarang),
+
+                        DatePicker::make('tgl_pengembalian')->label('Tanggal Pengembalian')->reactive()->disabled()->formatStateUsing(fn($record) => $record?->peminjaman?->tgl_pengembalian),
+
+                        DatePicker::make('tgl_kembali')->label('Tanggal Kembali')->default(Carbon::now()),
+
+                        TextInput::make('harga_buku')->hidden(),
+
+                        Select::make('id_kategori_denda')->label('Kondisi Buku')
+                            ->options(
+                                KategoriDenda::all()->pluck('nama_kategori', 'id')
                             )
-                            ->dehydrated(false),
+                            ->reactive()
+                            ->disabled(fn (callable $get) => !$get('nis') || !$get('judul_buku'))
+                            ->afterStateUpdated(
+                                function($state, callable $set, callable $get){
+                                    $kategori = KategoriDenda::find($state);
+                                    
+                                    $denda_kerusakan =  $kategori->jumlah_denda * $get('harga_buku');
+                                    $tgl_pengembalian = $get('tgl_pengembalian');
+                                    if($tgl_pengembalian && Carbon::parse($tgl_pengembalian)->isPast()){
+                                        $set('denda', $denda_kerusakan + 20000 );
+
+                                    }else{
+                                        $set('denda', $denda_kerusakan);
+                                    }
+                                    $set('id_kategori_denda', $kategori?->id);
+                                }
+                            ),
                         
                         
                         TextInput::make('denda')
@@ -173,13 +203,14 @@ class PengembalianResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('peminjaman.user.name'),
-                TextColumn::make('peminjaman.user.kelas'),
-                TextColumn::make('peminjaman.buku.judul_buku'),
-                TextColumn::make('kategori_denda.nama_kategori')
+                TextColumn::make('peminjaman.user.name')->searchable(),
+                TextColumn::make('peminjaman.user.kelas')->searchable(),
+                TextColumn::make('peminjaman.buku.judul_buku')->searchable(),
+                TextColumn::make('kategori_denda.nama_kategori')->searchable()
                 ->label('Kondisi Buku'),
-                TextColumn::make('peminjaman.buku.pengarang')
+                TextColumn::make('peminjaman.buku.pengarang')->searchable() 
                 ->label('Pengarang'),
+                TextColumn::make('created_at')->label('Tanggal Kembali')->searchable()->sortable()->date('d-m-Y')
             ])
             ->filters([
                 //

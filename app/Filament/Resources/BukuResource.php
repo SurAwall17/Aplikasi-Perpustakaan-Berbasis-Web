@@ -77,13 +77,13 @@ class BukuResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('judul_buku'),
-                TextColumn::make('pengarang'),
-                TextColumn::make('tahun_terbit'),
-                TextColumn::make('no_inventaris'),
-                TextColumn::make('harga_buku'),
-                TextColumn::make('tgl_masuk'),
-                TextColumn::make('stok'),
+                TextColumn::make('judul_buku')->searchable(),
+                TextColumn::make('pengarang')->searchable(),
+                TextColumn::make('tahun_terbit')->searchable(),
+                TextColumn::make('no_inventaris')->searchable(),
+                TextColumn::make('harga_buku')->searchable(),
+                TextColumn::make('tgl_masuk')->searchable(),
+                TextColumn::make('stok')->searchable(),
             ])
             ->filters([
                 //
