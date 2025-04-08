@@ -110,8 +110,8 @@ class BukuResource extends Resource
     {
         return [
             'index' => Pages\ListBukus::route('/'),
-            'create' => Pages\CreateBuku::route('/create'),
-            'edit' => Pages\EditBuku::route('/{record}/edit'),
+            // 'create' => Pages\CreateBuku::route('/create'),
+            // 'edit' => Pages\EditBuku::route('/{record}/edit'),
         ];
     }
 }

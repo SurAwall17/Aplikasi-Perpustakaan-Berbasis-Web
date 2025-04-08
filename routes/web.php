@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MidtransController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('index');
 });
+// Route::get('/midtrans/callback', [MidtransController::class, 'callback']);
+
+Route::get('/midtrans/finish', [MidtransController::class, 'finish'])->name('midtrans.finish');
+

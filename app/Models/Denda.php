@@ -14,4 +14,8 @@ class Denda extends Model
     public function pengembalian(){
         return $this->belongsTo(Pengembalian::class, 'id_pengembalian');
     }
+
+    public function laporan(){
+        return $this->hasMany(laporan::class);
+    }
 }

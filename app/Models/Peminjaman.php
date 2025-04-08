@@ -38,6 +38,32 @@ class Peminjaman extends Model
             }
         });
 
+        static::updating(function ($peminjaman) {
+            // Ambil data lama sebelum update
+            $originalBukuId = $peminjaman->getOriginal('id_buku');
+            $newBukuId = $peminjaman->id_buku;
+        
+            // Jika buku yang dipinjam berubah
+            if ($originalBukuId !== $newBukuId) {
+                // Tambah stok buku lama
+                $bukuLama = Buku::find($originalBukuId);
+                if ($bukuLama) {
+                    $bukuLama->stok += 1;
+                    $bukuLama->save();
+                }
+        
+                // Kurangi stok buku baru jika tersedia
+                $bukuBaru = Buku::find($newBukuId);
+                if ($bukuBaru && $bukuBaru->stok >= 1) {
+                    $bukuBaru->stok -= 1;
+                    $bukuBaru->save();
+                } else {
+                    throw new \Exception('Stok buku baru tidak mencukupi.');
+                }
+            }
+        });
+        
+
         static::deleting(function ($peminjaman) {
             $buku = Buku::find($peminjaman->id_buku);
             if ($buku) {

@@ -58,7 +58,7 @@ class PengembalianResource extends Resource
                             ->dehydrated(true),
                         
                         Select::make('nis')
-                        ->formatStateUsing(fn($record) => $record?->peminjaman?->user?->id)
+                        ->formatStateUsing(fn($record) => $record?->peminjaman?->user?->nis)
                         ->options(
                             User::whereIn(
                                 'id',
@@ -67,6 +67,7 @@ class PengembalianResource extends Resource
                             ->get()
                             ->pluck('nis', 'id')
                             )
+                        ->disabled(fn($record)=>filled($record))
 
                         
 
@@ -113,7 +114,12 @@ class PengembalianResource extends Resource
                             }
                     
                             // Jika create dan nis ada, tampilkan buku yang pernah dipinjam user
-                            $bukuIds = Peminjaman::where('id_user', $userId)->pluck('id_buku');
+                            if(!$record){
+                                $bukuIds = Peminjaman::where('id_user', $userId)->where('status', 'dipinjam')->pluck('id_buku');
+                            }else{
+                                $bukuIds = Peminjaman::where('id_user', $userId)->pluck('id_buku');
+
+                            }
                     
                             return Buku::whereIn('id', $bukuIds)
                                 ->pluck('judul_buku', 'id');
@@ -133,7 +139,10 @@ class PengembalianResource extends Resource
                                 ->latest('created_at')
                                 ->first();
 
-                                $set('tgl_pengembalian', $peminjaman?->tgl_pengembalian);
+                                if(!$record){
+
+                                    $set('tgl_pengembalian', $peminjaman?->tgl_pengembalian);
+                                }
 
                                 if ($record) {
                                 
@@ -189,6 +198,7 @@ class PengembalianResource extends Resource
                         
                         
                         TextInput::make('denda')
+                        ->prefix('Rp')
                         ->readOnly(),
                         ])
                         ->columns(2),
@@ -208,6 +218,8 @@ class PengembalianResource extends Resource
                 TextColumn::make('peminjaman.buku.judul_buku')->searchable(),
                 TextColumn::make('kategori_denda.nama_kategori')->searchable()
                 ->label('Kondisi Buku'),
+                TextColumn::make('denda')->searchable()
+                ->label('Total Denda'),
                 TextColumn::make('peminjaman.buku.pengarang')->searchable() 
                 ->label('Pengarang'),
                 TextColumn::make('created_at')->label('Tanggal Kembali')->searchable()->sortable()->date('d-m-Y')

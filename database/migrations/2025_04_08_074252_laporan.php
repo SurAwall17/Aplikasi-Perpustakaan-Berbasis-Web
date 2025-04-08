@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('denda', function (Blueprint $table) {
+        Schema::create('laporan', function (Blueprint $table) {
             $table->id();
-            $table->string('order_id');
-            $table->foreignId('id_pengembalian')->constrained('pengembalian')->cascadeOnDelete();
-            $table->enum('status',['Belum Dibayar', 'Sudah Dibayar'])->default('Belum Dibayar');
+            $table->foreignId('id_denda')->constrained('denda')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('denda');
+        Schema::dropIfExists('laporan');
     }
 };

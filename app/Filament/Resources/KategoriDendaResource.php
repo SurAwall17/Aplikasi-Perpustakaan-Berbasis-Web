@@ -81,8 +81,8 @@ class KategoriDendaResource extends Resource
     {
         return [
             'index' => Pages\ListKategoriDendas::route('/'),
-            'create' => Pages\CreateKategoriDenda::route('/create'),
-            'edit' => Pages\EditKategoriDenda::route('/{record}/edit'),
+            // 'create' => Pages\CreateKategoriDenda::route('/create'),
+            // 'edit' => Pages\EditKategoriDenda::route('/{record}/edit'),
         ];
     }
 }

@@ -184,8 +184,8 @@ class PeminjamanResource extends Resource
     {
         return [
             'index' => Pages\ListPeminjamen::route('/'),
-            'create' => Pages\CreatePeminjaman::route('/create'),
-            'edit' => Pages\EditPeminjaman::route('/{record}/edit'),
+            // 'create' => Pages\CreatePeminjaman::route('/create'),
+            // 'edit' => Pages\EditPeminjaman::route('/{record}/edit'),
         ];
     }
 }

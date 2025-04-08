@@ -42,6 +42,7 @@ class Pengembalian extends Model
             if ($pengembalian->denda > 0) {
                 $denda = new Denda();
                 $denda->id_pengembalian = $pengembalian->id;
+                $denda->order_id = 'ORDER-' . $pengembalian->id . '-' . time();
                 $denda->save();
             }
         });

@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Providers;
-use Illuminate\Database\Eloquent\Model;
+use Midtrans\Config;
 
+use Filament\Facades\Filament;
+use Filament\Support\Assets\Js;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::unguard();
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
     }
 }
