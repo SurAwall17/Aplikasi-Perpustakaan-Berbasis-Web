@@ -21,3 +21,6 @@ Route::get('/', function () {
 
 Route::get('/midtrans/finish', [MidtransController::class, 'finish'])->name('midtrans.finish');
 
+Route::get('/export-peminjaman',[ExportController::class , 'export_peminjaman']);
+Route::get('/export-pengembalian',[ExportController::class , 'export_pengembalian']);
+Route::get('/export-denda',[ExportController::class , 'denda']);

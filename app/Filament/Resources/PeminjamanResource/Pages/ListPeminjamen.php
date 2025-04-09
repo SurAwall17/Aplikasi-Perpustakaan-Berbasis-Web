@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\PeminjamanResource\Pages;
 
-use App\Filament\Resources\PeminjamanResource;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\PeminjamanResource;
 
 class ListPeminjamen extends ListRecords
 {
@@ -14,6 +15,7 @@ class ListPeminjamen extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+
         ];
     }
 }

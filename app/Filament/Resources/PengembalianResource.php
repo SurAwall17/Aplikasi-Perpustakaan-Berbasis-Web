@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PengembalianResource\Pages;
 use App\Filament\Resources\PengembalianResource\RelationManagers;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 
 class PengembalianResource extends Resource
 {
@@ -223,6 +224,13 @@ class PengembalianResource extends Resource
                 TextColumn::make('peminjaman.buku.pengarang')->searchable() 
                 ->label('Pengarang'),
                 TextColumn::make('created_at')->label('Tanggal Kembali')->searchable()->sortable()->date('d-m-Y')
+            ])->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Cetak Laporan')
+                    ->defaultFormat('pdf')
+                    ->color('warning')
+                    ->modalHeading('Konfirmasi Export')
+                    ->fileName('laporan-pengembalian'),
             ])
             ->filters([
                 //
@@ -249,8 +257,8 @@ class PengembalianResource extends Resource
     {
         return [
             'index' => Pages\ListPengembalians::route('/'),
-            'create' => Pages\CreatePengembalian::route('/create'),
-            'edit' => Pages\EditPengembalian::route('/{record}/edit'),
+            // 'create' => Pages\CreatePengembalian::route('/create'),
+            // 'edit' => Pages\EditPengembalian::route('/{record}/edit'),
         ];
     }
 }

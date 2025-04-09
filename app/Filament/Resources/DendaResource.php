@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\DendaResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\DendaResource\RelationManagers;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 
 class DendaResource extends Resource
 {
@@ -90,19 +91,40 @@ class DendaResource extends Resource
                 TextColumn::make('pengembalian.denda')->label('Total Denda')->searchable(),
                 TextColumn::make('status')->searchable()
                 ->badge()
+                ->formatStateUsing(function ($state){
+                    if($state == 'Sudah Dibayar'){
+                        $state = 'Paid';
+                        return $state;
+                    }else{
+                        $state = 'Unpaid';
+                        return $state;
+                    }
+                })
                 ->color(fn (string $state): string => match ($state) {
                     'Sudah Dibayar' => 'success',
-                    'Belum Dibayar' => 'danger',
+                    'Belum Dibayar' => 'warning',
                 })
+                ->icon(fn (string $state): string => match ($state) {
+                    'Sudah Dibayar' => 'heroicon-o-check-circle',
+                    'Belum Dibayar' => 'heroicon-o-clock',
+                })
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Cetak Laporan')
+                    ->defaultFormat('pdf')
+                    ->color('warning')
+                    ->modalHeading('Konfirmasi Export')
+                    ->fileName('laporan-denda'),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Action::make('bayar')
-                ->label('Bayar Sekarang')
+                ->label('Pay Now')
                 ->icon('heroicon-o-credit-card')
-                ->color('success')
+                ->color('warning')
                 ->action(function ($record) {
                     
                     $params = [

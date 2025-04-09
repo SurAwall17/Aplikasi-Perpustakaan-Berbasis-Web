@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\PeminjamanResource\Pages;
 use App\Filament\Resources\PeminjamanResource\RelationManagers;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 
 class PeminjamanResource extends Resource
 {
@@ -158,6 +159,14 @@ class PeminjamanResource extends Resource
                 })
 
 
+            ])->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Cetak Laporan')
+                    ->color('warning')
+                    ->defaultFormat('pdf')
+                    ->color('warning')
+                    ->modalHeading('Konfirmasi Export')
+                    ->fileName('laporan-peminjaman'),
             ])
             ->filters([
                 //
