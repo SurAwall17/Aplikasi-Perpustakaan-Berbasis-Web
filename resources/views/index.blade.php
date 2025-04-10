@@ -27,10 +27,23 @@
                     <li><a href="#Features" id="menu-features" class="nav-link p-1">Features</a></li>
                     <li><a href="#about" id="menu-about" class="nav-link p-1">About</a></li>
                 </ul>
-                <div class="button hidden md:flex">
-                    <button class="bg-white border-primary border-2 font-bold hover:bg-gray-300 ease-in-out duration-300 text-primary p-1 w-20 me-3">Sign Up</button>
-                    <button class="primary-btn font-bold hover:bg-gray-300 ease-in-out duration-300 text-white p-1 w-20">Login</button>
-                </div>
+                @if (Auth()->user())
+                <form action="/logout" method="post">
+                    @csrf
+                    <div class="button hidden md:flex">
+                        <button class="primary-btn font-bold hover:bg-gray-300 ease-in-out duration-300 text-white p-1 w-20">Logout</button>
+                    </div>
+                </form>
+                @else
+                    <div class="button hidden md:flex">
+                        <a href="/register">
+                            <button class="bg-white border-primary border-2 font-bold hover:bg-gray-300 ease-in-out duration-300 text-primary p-1 w-20 me-3">Sign Up</button>
+                        </a>
+                        <a href="/login">
+                            <button class="primary-btn font-bold hover:bg-gray-300 ease-in-out duration-300 text-white p-[6px] w-20">Login</button>
+                        </a>
+                    </div>
+                @endif
                 <div class="burger md:hidden">
                     <i class="fa-solid fa-bars text-2xl"></i>
                 </div>

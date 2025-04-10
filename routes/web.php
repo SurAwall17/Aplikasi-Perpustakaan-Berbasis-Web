@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +26,11 @@ Route::get('/midtrans/finish', [MidtransController::class, 'finish'])->name('mid
 Route::get('/export-peminjaman',[ExportController::class , 'export_peminjaman']);
 Route::get('/export-pengembalian',[ExportController::class , 'export_pengembalian']);
 Route::get('/export-denda',[ExportController::class , 'denda']);
+
+Route::get('/login', [LoginController::class, 'view_login']);
+Route::post('/login', [LoginController::class, 'login']);
+
+Route::get('/register', [RegisterController::class, 'view_register']);
+Route::post('/register', [RegisterController::class, 'register']);
+
+Route::post('/logout', [LoginController::class, 'logout']);
