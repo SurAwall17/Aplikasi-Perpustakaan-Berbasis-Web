@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     @vite('resources/css/app.css')
-    <title>Register</title>
+    <title>Login</title>
 </head>
 <body class="h-full">
     <div class="container bg-blue-400 h-[100vh] flex justify-center items-center" style="background-image: url('{{ asset('images/header/header.png') }}');background-size:cover;">

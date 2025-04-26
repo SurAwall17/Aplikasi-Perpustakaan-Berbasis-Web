@@ -17,10 +17,10 @@
     }
 
     .btn-secondary{
-        @apply bg-blue-500 text-white px-4 py-2 transition-all duration-300 ease-in-out;
+        @apply bg-primary text-white px-4 py-2 transition-all duration-300 ease-in-out;
     }
     .btn-secondary:hover{
-        @apply bg-blue-600 text-white px-4 py-2 ;
+        @apply bg-primary text-white px-4 py-2 ;
 
     }
     

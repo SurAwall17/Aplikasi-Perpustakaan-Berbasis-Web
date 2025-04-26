@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\PeminjamanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,3 +35,14 @@ Route::get('/register', [RegisterController::class, 'view_register']);
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::post('/logout', [LoginController::class, 'logout']);
+
+Route::get('/buku', [PeminjamanController::class, 'daftar_buku']);
+
+Route::get('/pinjam', [PeminjamanController::class, 'form_peminjaman'])->middleware('auth');
+Route::post('/pinjam', [PeminjamanController::class, 'tambah_peminjaman'])->middleware('auth');
+
+Route::get('/peminjaman', [PeminjamanController::class, 'data_peminjaman'])->middleware('auth');
+
+Route::get('/pengembalian', [PeminjamanController::class, 'form_pengembalian']);
+
+

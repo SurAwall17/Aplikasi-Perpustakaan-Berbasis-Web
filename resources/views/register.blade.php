@@ -36,13 +36,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Kolom Kiri -->
               <div>
-                <label for="nis" class="block text-sm font-medium text-gray-900">Nomor Induk Siswa</label>
-                <input type="text" name="nis" id="nis" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
-              </div>
-              <!-- Kolom Kanan -->
-              <div>
-                <label for="nohp" class="block text-sm font-medium text-gray-900">Nomor HP Wali</label>
-                <input type="text" name="nohp_wali" id="nohp" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
+                <label for="nik" class="block text-sm font-medium text-gray-900">NIK</label>
+                <input type="text" name="nik" id="nik" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
               </div>
       
               <!-- Kolom Kiri -->
@@ -56,30 +51,10 @@
                 <input type="email" name="email" id="email" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
               </div>
       
-              <!-- Kolom Kiri -->
-              <div>
-                <label for="kelas" class="block text-sm font-medium text-gray-900">Kelas</label>
-                <input type="text" name="kelas" id="kelas" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
-              </div>
               <!-- Kolom Kanan -->
               <div>
                 <label for="password" class="block text-sm font-medium text-gray-900">Password</label>
                 <input type="password" name="password" id="password" required class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary">
-              </div>
-      
-              <!-- Kolom Kiri -->
-              <div>
-                <label for="jenis_kelamin" class="block text-sm font-medium text-gray-900 mb-1">Jenis Kelamin</label>
-                <select
-                  name="jenis_kelamin"
-                  id="jenis_kelamin"
-                  required
-                  class="mt-2 block h-12 border-2 w-full rounded-md px-3 py-1.5 text-base text-gray-900 focus:outline-primary"
-                >
-                  <option value="" disabled selected>Pilih Jenis Kelamin</option>
-                  <option value="L">Laki-laki</option>
-                  <option value="P">Perempuan</option>
-                </select>
               </div>
               
               <!-- Kolom Kanan -->
